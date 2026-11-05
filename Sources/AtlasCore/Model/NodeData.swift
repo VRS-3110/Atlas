@@ -219,10 +219,17 @@ public struct TaskInfo: Codable, Equatable, Sendable {
     public var completedAt: Date?
     /// Focus time logged with the deep-work timer, in seconds.
     public var focusSeconds: Double
+    /// When the status last changed. Nil for tasks whose status has not changed since this was
+    /// added. JourneyMan uses it to tell which app changed a task last.
+    public var statusChangedAt: Date?
+    /// Minutes tracked for this task in JourneyMan (its own timer and logs, not the focus time
+    /// above), read from the shared folder.
+    public var journeyManMinutes: Double
 
     public init(status: TaskStatus = .todo, priority: TaskPriority = .none, due: Date? = nil,
                 scheduledStart: Date? = nil, durationMinutes: Int = 30,
-                completedAt: Date? = nil, focusSeconds: Double = 0) {
+                completedAt: Date? = nil, focusSeconds: Double = 0,
+                statusChangedAt: Date? = nil, journeyManMinutes: Double = 0) {
         self.status = status
         self.priority = priority
         self.due = due
@@ -230,10 +237,13 @@ public struct TaskInfo: Codable, Equatable, Sendable {
         self.durationMinutes = durationMinutes
         self.completedAt = completedAt
         self.focusSeconds = focusSeconds
+        self.statusChangedAt = statusChangedAt
+        self.journeyManMinutes = journeyManMinutes
     }
 
     enum CodingKeys: String, CodingKey {
         case status, priority, due, scheduledStart, durationMinutes, completedAt, focusSeconds
+        case statusChangedAt, journeyManMinutes
     }
 
     public init(from decoder: Decoder) throws {
@@ -245,6 +255,23 @@ public struct TaskInfo: Codable, Equatable, Sendable {
         durationMinutes = c.lenient(.durationMinutes, 30)
         completedAt = c.optional(.completedAt)
         focusSeconds = c.lenient(.focusSeconds, 0)
+        statusChangedAt = c.optional(.statusChangedAt)
+        journeyManMinutes = c.lenient(.journeyManMinutes, 0)
+    }
+
+    /// Changes the status, stamping when it changed and when the task was completed.
+    /// Setting the status it already has changes nothing.
+    public mutating func setStatus(_ newStatus: TaskStatus, at date: Date) {
+        guard newStatus != status else { return }
+        status = newStatus
+        completedAt = newStatus == .done ? (completedAt ?? date) : nil
+        statusChangedAt = date
+    }
+
+    /// When the status last changed, as far as Atlas knows: for older tasks, when they were
+    /// completed, or nil.
+    public var lastStatusChange: Date? {
+        statusChangedAt ?? (status == .done ? completedAt : nil)
     }
 
     public var scheduledEnd: Date? {

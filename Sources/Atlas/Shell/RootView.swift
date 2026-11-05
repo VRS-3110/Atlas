@@ -29,6 +29,12 @@ struct RootView: View {
         }
         .environment(window)
         .focusedSceneValue(\.windowState, window)
+        // atlas://node/<id> (from JourneyMan's Open in Atlas) reveals the node in this window.
+        .onOpenURL { url in
+            guard let id = JourneyManLink.nodeID(from: url), workspace.nodes[id] != nil else { return }
+            window.reveal(id, in: workspace)
+        }
+        .handlesExternalEvents(preferring: ["*"], allowing: ["*"])
         .onAppear {
             DebugScript.activeWindow = window
             if window.selection == nil {

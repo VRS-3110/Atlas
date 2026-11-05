@@ -7,6 +7,7 @@
 | 3 | Quick capture, Inbox, sources library, DOI lookup, BibTeX, templates | Done |
 | 4 | Tasks, Today and Week, calendar (EventKit), daily log, weekly review | Done |
 | 5 | Export, performance, accessibility, polish | Done (version 1.0) |
+| After 1.0 | Link with JourneyMan | Done (version 1.1) |
 
 ---
 
@@ -728,3 +729,54 @@ compositing, not Atlas's own work. The 500-node target is met.
 - Notarisation needs your Apple Developer ID; the app is signed ad hoc.
 - Citation styles beyond APA-like.
 - Exporting several maps at once, and PDF pages split for printing large maps.
+
+---
+
+## After 1.0: link with JourneyMan (version 1.1)
+
+### What was built
+
+- **Sharing** (Settings ▸ JourneyMan). While it is on, Atlas writes every task to
+  `~/Documents/JourneyMan/atlas/tasks.json`, 1.5 seconds after tasks change. It reads
+  JourneyMan's `journeyman.json` at launch, on activation and every 30 seconds.
+- **Done both ways.** The app where a task was ticked or unticked last wins. To know when that
+  was, tasks now record `statusChangedAt`. `TaskInfo.setStatus(_:at:)` is the one place a
+  status changes, used by the planner and the inspector.
+- **Time both ways, counted once.** Focus time goes to JourneyMan, which logs it as deep work.
+  JourneyMan's own tracked time comes back as `journeyManMinutes`, shown in the inspector
+  as Tracked in JourneyMan.
+- **Links.** `atlas://node/<id>` opens Atlas and reveals the node. The inspector's
+  Open in JourneyMan opens the task in JourneyMan, at the address JourneyMan reports
+  (or one typed in Settings).
+
+Details and both file formats: [JOURNEYMAN.md](JOURNEYMAN.md).
+
+### Verified
+
+- `JourneyManLinkTests` (8 tests) cover the export, the done rules, time, reading
+  JavaScript dates, refusing other files and the links.
+- AtlasCore and its tests were compiled with Swift 6.0 on Linux, with stand-ins for
+  CoreGraphics, UTType and SQLite3. All 152 tests passed.
+- `JourneyManSync` was compiled the same way, with a stand-in for `NSWorkspace`.
+- A full round trip ran between this code and JourneyMan's own JavaScript, through real
+  files:
+  1. Atlas wrote two tasks.
+  2. JourneyMan imported them, ticked one and logged 30 minutes.
+  3. Atlas applied that as one undo step.
+  4. Reading again on both sides changed nothing.
+- **Not yet run on a Mac:** the SwiftUI changes (the Settings section, the inspector rows
+  and `onOpenURL`) and the `atlas://` URL registration. `Scripts/test.sh` and
+  `Scripts/run.sh` check them.
+
+### Decisions and assumptions
+
+1. **A shared folder, not a server.** JourneyMan runs in a browser, which can't reach Atlas's
+   database or a local server without mixed-content and private-network problems.
+   Chrome can keep a folder connected, so plain files work with no accounts.
+2. **Atlas owns names and dates.** JourneyMan's edits to them stay until that field changes in
+   Atlas. Only done and time go back.
+3. **Updates from JourneyMan are undoable.** Each one is a normal undo step. A step that
+   skipped the history could be wiped out by undoing an older edit to the same task.
+4. **Time is kept apart.** JourneyMan's time is not added to `focusSeconds`. Each app shows the
+   other's time without counting it twice.
+

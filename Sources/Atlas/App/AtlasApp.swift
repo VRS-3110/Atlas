@@ -70,13 +70,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         AppStore.shared.workspace.persistence?.makeDailyBackupIfNeeded()
         QuickCapture.shared.start()
+        JourneyManSync.shared.start(with: AppStore.shared.workspace)
         DebugSnapshot.scheduleIfRequested()
         DebugScript.scheduleIfRequested()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         FocusTimer.shared.stop(workspace: AppStore.shared.workspace)
+        JourneyManSync.shared.flush()
         AppStore.shared.workspace.saveNow()
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        JourneyManSync.shared.syncNow()
     }
 
     func applicationDidResignActive(_ notification: Notification) {

@@ -115,8 +115,7 @@ extension Workspace {
                 guard let node = nodes[id], node.task != nil else { continue }
                 tx.update(node) { data in
                     guard var task = data.task else { return }
-                    task.status = status
-                    task.completedAt = status == .done ? (task.completedAt ?? now) : nil
+                    task.setStatus(status, at: now)
                     data.task = task
                 }
             }

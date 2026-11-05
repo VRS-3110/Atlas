@@ -10,6 +10,9 @@ struct SettingsView: View {
     @AppStorage(PlannerSettings.staleDaysKey) private var staleDays = 14
     @State private var shortcutTaken = false
     @State private var calendar = CalendarService.shared
+    @AppStorage(JourneyManSync.enabledKey) private var shareWithJourneyMan = false
+    @AppStorage(JourneyManSync.addressKey) private var journeyManAddress = ""
+    @State private var journeyMan = JourneyManSync.shared
 
     var body: some View {
         Form {
@@ -46,6 +49,31 @@ struct SettingsView: View {
                     ForEach(0..<13) { hour in Text(hourTitle(hour)).tag(hour) }
                 }
                 Stepper("Review flags branches untouched for \(staleDays) days", value: $staleDays, in: 3...90)
+            }
+            Section("JourneyMan") {
+                Toggle("Share tasks with JourneyMan", isOn: $shareWithJourneyMan)
+                    .onChange(of: shareWithJourneyMan) { journeyMan.sharingChanged() }
+                Text("JourneyMan, the time tracker, shows your tasks with a project for each map. Ticking a task in either app ticks it in both, focus time goes to JourneyMan, and time tracked there shows in the inspector. Both apps use a folder on this Mac; nothing goes online.")
+                    .font(.caption).foregroundStyle(.secondary)
+                if shareWithJourneyMan {
+                    LabeledContent("Folder") {
+                        Button(journeyMan.folder.path) { journeyMan.revealFolder() }
+                            .buttonStyle(.link)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
+                    TextField("JourneyMan address", text: $journeyManAddress,
+                              prompt: Text(journeyMan.reportedAddress ?? "Filled in by JourneyMan"))
+                    LabeledContent("Status") {
+                        Text(journeyMan.statusText).foregroundStyle(.secondary)
+                    }
+                    if let problem = journeyMan.problem {
+                        Label(problem, systemImage: "exclamationmark.triangle")
+                            .foregroundStyle(.orange)
+                    }
+                    Text("In JourneyMan, open Connections ▸ Atlas and connect this folder.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
             }
             Section("Workspace") {
                 LabeledContent("Saved in") {

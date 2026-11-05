@@ -141,6 +141,16 @@ private struct TaskSection: View {
                     DatePicker("Due", selection: Binding(get: { due }, set: { d in update("Set Due Date") { $0.due = d } }),
                                displayedComponents: .date)
                 }
+                if task.journeyManMinutes >= 1 {
+                    LabeledContent("Tracked in JourneyMan", value: JourneyManLink.durationText(minutes: task.journeyManMinutes))
+                }
+                if let url = JourneyManSync.shared.taskURL(for: node.id) {
+                    Button {
+                        NSWorkspace.shared.open(url)
+                    } label: {
+                        Label("Open in JourneyMan", systemImage: "arrow.up.forward.app")
+                    }
+                }
                 Button("Remove Task", role: .destructive) {
                     workspace.updateNode(node, "Remove Task") { $0.task = nil }
                 }
@@ -168,10 +178,12 @@ private struct TaskSection: View {
     private func taskBinding<T: Equatable>(_ keyPath: WritableKeyPath<TaskInfo, T>, _ task: TaskInfo) -> Binding<T> {
         Binding(get: { node.task?[keyPath: keyPath] ?? task[keyPath: keyPath] },
                 set: { value in
+                    let now = workspace.clock()
                     update("Edit Task") { t in
-                        t[keyPath: keyPath] = value
-                        if keyPath == \TaskInfo.status {
-                            t.completedAt = t.status == .done ? (t.completedAt ?? .now) : nil
+                        if keyPath == \TaskInfo.status, let status = value as? TaskStatus {
+                            t.setStatus(status, at: now)
+                        } else {
+                            t[keyPath: keyPath] = value
                         }
                     }
                 })

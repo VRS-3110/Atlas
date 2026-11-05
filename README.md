@@ -30,7 +30,7 @@ That builds a debug `build/Atlas.app` and opens it. Other entry points:
 The release app runs on any Mac with macOS 14 or later, Apple silicon or Intel. It is
 signed ad hoc rather than with a Developer ID, and it is not notarised. It opens normally on the Mac that built it. On another Mac,
 macOS blocks the first launch: choose Open Anyway in System Settings ▸ Privacy & Security.
-Each phase bumped the version; the finished app is 1.0. `swift Scripts/make-icon.swift`
+Each phase bumped the version; the finished app was 1.0, and 1.1 added the JourneyMan link. `swift Scripts/make-icon.swift`
 redraws the app icon.
 
 The scripts work around two quirks of a Command Line Tools-only install. Neither touches
@@ -46,6 +46,7 @@ Testing framework. With Xcode selected, both steps are skipped.
 | Workspace | `~/Library/Application Support/Atlas/Atlas.sqlite` |
 | Daily backups (newest 7 kept), and a copy made before each restore | `~/Library/Application Support/Atlas/Backups/` |
 | Attached PDFs and files | `~/Library/Application Support/Atlas/Attachments/` |
+| Tasks shared with JourneyMan (only when sharing is on) | `~/Documents/JourneyMan/atlas/` |
 
 File ▸ Back Up Workspace… writes a single portable `.atlasbackup` file (JSON, with the
 attached files inside); File ▸ Restore from Backup… replaces the workspace with one, after
@@ -167,6 +168,19 @@ where it is used, a link, what the node cites, task dates and the start of its n
 Export a map from File ▸ Export Map as PNG, PDF, a Markdown outline or OPML. File ▸ Import
 Outline… makes a map from OPML, Markdown or indented text.
 
+## Working with JourneyMan
+
+Atlas can share its tasks with [JourneyMan](https://github.com/VRS-3110/JourneyMan), a time
+tracker. Turn it on in Settings ▸ JourneyMan.
+
+- Tasks show up in JourneyMan with a project for each map.
+- Done goes both ways.
+- Focus time becomes deep work there, and time tracked there shows in the inspector.
+- **Open in JourneyMan** and **Open in Atlas** (`atlas://node/<id>`) jump between them.
+
+The apps share a folder on this Mac, `~/Documents/JourneyMan/atlas`, and nothing goes
+online. Setup, the sync rules and both file formats are in [JOURNEYMAN.md](JOURNEYMAN.md).
+
 ## How it is put together
 
 | Module | Contents | Depends on |
@@ -188,7 +202,8 @@ Outline… makes a map from OPML, Markdown or indented text.
   matching behind the ⌘K palette.
 - **Research.** BibTeX, citation keys and formatting, Crossref and web-page metadata,
   capture rules, templates, sources and quotes.
-- **Planning.** Scheduling, the daily log and the weekly review.
+- **Planning.** Scheduling, the daily log, the weekly review, and the JourneyMan link's
+  file formats and rules.
 - **Export.** Markdown and OPML, outline import, and workspace backup and restore.
 
 The `Atlas` app:
