@@ -99,7 +99,8 @@ Both are JSON. Dates are ISO 8601 in UTC, with or without milliseconds. Each fil
 ```
 
 - `appUrl`: where JourneyMan runs. Atlas builds **Open in JourneyMan** from it
-  (`<appUrl>#task/atlas:<id>`). Type an address in Settings to use a different one.
+  (`<appUrl>#task/atlas:<id>`). Type an address in Settings to use a different one. The
+  JourneyMan Mac app reports `journeyman://localhost/index.html`, which opens the app.
 - `trackedMinutes`: time tracked in JourneyMan itself. Focus time that came from Atlas is
   not included.
 

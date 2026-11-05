@@ -43,12 +43,13 @@ public enum JourneyManLink {
     }
 
     /// The JourneyMan page for the task made from a node, given the address JourneyMan runs
-    /// at (it reports this in journeyman.json). Only web addresses are accepted.
+    /// at (it reports this in journeyman.json). Web addresses are accepted, and the JourneyMan
+    /// Mac app's own journeyman:// address.
     public static func journeyManURL(for nodeID: UUID, appURL: String) -> URL? {
         let trimmed = appURL.trimmingCharacters(in: .whitespacesAndNewlines)
         let base = trimmed.split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false).first.map(String.init) ?? ""
         guard !base.isEmpty, let url = URL(string: "\(base)#task/atlas:\(nodeID.uuidString)"),
-              let scheme = url.scheme?.lowercased(), scheme == "http" || scheme == "https" else { return nil }
+              let scheme = url.scheme?.lowercased(), ["http", "https", "journeyman"].contains(scheme) else { return nil }
         return url
     }
 

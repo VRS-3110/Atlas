@@ -140,6 +140,8 @@ struct JourneyManLinkTests {
         #expect(JourneyManLink.nodeID(from: URL(string: "https://example.com/node/\(id.uuidString)")!) == nil)
         #expect(JourneyManLink.journeyManURL(for: id, appURL: "http://localhost:8000/#today")?.absoluteString
             == "http://localhost:8000/#task/atlas:\(id.uuidString)")
+        #expect(JourneyManLink.journeyManURL(for: id, appURL: "journeyman://localhost/index.html")?.absoluteString
+            == "journeyman://localhost/index.html#task/atlas:\(id.uuidString)") // the JourneyMan Mac app
         #expect(JourneyManLink.journeyManURL(for: id, appURL: "javascript:alert(1)") == nil)
         #expect(JourneyManLink.journeyManURL(for: id, appURL: "") == nil)
         #expect(JourneyManLink.durationText(minutes: 80) == "1h 20m")
