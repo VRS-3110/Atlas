@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>Atlas</string>
+	<key>CFBundleExecutable</key>
+	<string>Atlas</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>local.atlas.Atlas</string>
+	<key>CFBundleName</key>
+	<string>Atlas</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>4</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>LSMultipleInstancesProhibited</key>
+	<true/>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Atlas shows your existing calendar events next to your time blocks on the Today and Week timelines. It never changes your calendars.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Atlas shows your calendar events, read-only, beside your tasks in Today and Week.</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSSupportsAutomaticTermination</key>
+	<false/>
+	<key>NSSupportsSuddenTermination</key>
+	<false/>
+</dict>
+</plist>
